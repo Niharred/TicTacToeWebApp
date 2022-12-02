@@ -1,0 +1,191 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+    .banner{
+        background-color: deepskyblue;
+        font-size:80px;
+        font-display:auto;
+        color:white;
+        width:100%;
+        height:40%;
+    }
+    .banner-div{
+        height:40%;
+        font-size: 30px;
+    }
+
+    .banner-div-now{
+        height:40%;
+        font-size: 30px;
+        background-color:forestgreen;
+        height: 20%;
+        width:100%;
+        color:azure;
+    }
+    .game-board {
+        width: 600px;
+        height: 600px;
+        margin: 0 auto;
+        color: black;
+        border: 2px solid;
+        display: grid;
+        grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+    }
+
+    .box {
+        border: 2px solid;
+        border-radius: 2px;
+        font-family: Helvetica;
+        font-weight: bold;
+        font-size: 4em;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .banner-div-title {
+        height: 40%;
+        font-size: 30px;
+        background-color: deeppink;
+        height: 20%;
+        width: 100%;
+        color: azure;
+    }
+    </style>
+
+<div class="text-center">
+   
+
+    <div>
+        <div class="banner-div-title">
+            ****ONLINE GAME****
+        </div>
+        <div class="banner">
+          
+                TIC TAC TOE
+        </div>
+        <div class="banner-div" id="O">
+              O's turn
+        </div>
+        <div class="banner-div" id="X">
+            X's turn
+        </div>
+        <div class="banner-div-now" id="message-O-success">
+            O Wins!
+        </div>
+        <div class="banner-div-now" id="message-X-success">
+            X Wins!
+        </div>
+         <div class="banner-div-now" id="message-tie-success">
+           It's a tie
+        </div>
+        <div id="action-link">
+            <a href="@Url.ActionLink("Index","Home")">play again</a>
+        </div>
+        <body>
+            <div class="game-board">
+
+                <button class="box" id =1></button>
+                <button class="box"id =2></button>
+                <button class="box" id=3></button>
+                <button class="box" id=4></button>
+                <button class="box" id=5></button>
+                <button class="box" id=6></button>
+                <button class="box" id=7></button>
+                <button class="box" id =8></button>
+                <button class="box" id=9></button>
+            </div>
+        </body>
+       
+    </div>
+</div>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js">
+    </script>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#O').hide();
+        $('#message-O-success').hide();
+        $('#message-X-success').hide();
+        $('#message-tie-success').hide();
+        $('#action-link').hide();
+
+        var res= false;
+        debugger;
+        $( ".box" ).click(function() {
+            var ele ='';
+            var elestyle='';
+            var dummy ='abcdefghikl';
+            var id = $(this).attr('id');
+            $('#' + id).empty();
+            $('.banner-div').each(function (index) {
+             ele = $(this).attr('id');
+             elestyle = $(this).attr('style');
+                if (elestyle != 'display: none;') {
+
+                    $('#' + id).html(ele);
+                    $('#' + id).val(ele);
+                    $('#' + id).prop('disabled', true);
+                    $('#' +ele).hide();
+             }
+             else{
+                    $('#' + ele).show();
+             
+             }
+            });
+
+            var chars = '';
+            $('.box').each(function (index) {
+            var currentElement = $(this);
+                console.log(currentElement);
+                if (currentElement.val()=='')
+                {
+                currentElement = dummy[index];
+                chars = chars + currentElement + '|';
+                }
+                else
+                {
+                chars = chars+currentElement.val()+'|';
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("checker")",
+                data: { inputModelx: chars },
+                dataType: 'json',
+                success: function (msg) {
+                    res=msg
+                    console.log(msg);
+                    var dt = msg.split('1');
+                    debugger;
+                    if(dt[1]=='true')
+                    {
+                        $('#message-' +dt[0]+'-success').show();
+                        $('#X').hide();
+                        $('#O').hide();
+                        $('#action-link').show();
+
+                    }
+                    if (dt[0] == 'true') {
+                        $('#message-tie-success').show();
+                        $('#X').hide();
+                        $('#O').hide();
+                        $('#action-link').show();
+
+                    }
+                },
+                error: function (req, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+       if(res==true)
+       {
+
+       }
+
+    });
+
+</script>
